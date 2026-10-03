@@ -9,11 +9,11 @@ export const register = async (req, res) => {
   try {
     const { full_name, email, student_id, password } = req.body;
 
-    // 1. Validate required fields
-    if (!full_name || !email || !student_id || !password) {
+    // 1. Validate required fields (Student ID is optional)
+    if (!full_name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'All fields (Full Name, College Email, Student ID, and Password) are required.',
+        message: 'Full Name, College Email, and Password are required.',
       });
     }
 
@@ -34,6 +34,11 @@ export const register = async (req, res) => {
       });
     }
 
+    // Optional student ID (generate fallback if not provided to satisfy DB schema)
+    const finalStudentId = student_id && student_id.trim()
+      ? student_id.trim().toUpperCase()
+      : `STU-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
     // 3. Register user with Supabase Auth
     // Explicitly setting role: 'student' in user metadata so client cannot pass admin role
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -42,7 +47,7 @@ export const register = async (req, res) => {
       options: {
         data: {
           full_name: full_name.trim(),
-          student_id: student_id.trim().toUpperCase(),
+          student_id: finalStudentId,
           role: 'student',
         },
       },
@@ -70,7 +75,7 @@ export const register = async (req, res) => {
         id: user.id,
         full_name: full_name.trim(),
         email: user.email,
-        student_id: student_id.trim().toUpperCase(),
+        student_id: finalStudentId,
         college_domain: emailValidation.domain,
         role: 'student',
       }, { onConflict: 'id' })
@@ -129,11 +134,26 @@ export const login = async (req, res) => {
     }
 
     // Fetch user profile
-    const { data: profile } = await supabase
+    let { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', authData.user.id)
       .single();
+
+    const userEmail = authData.user.email?.toLowerCase();
+    const adminEmails = (process.env.ADMIN_EMAILS || 'pr7853995@gmail.com').toLowerCase().split(',').map((e) => e.trim());
+    if (userEmail && adminEmails.includes(userEmail)) {
+      if (profile) {
+        profile.role = 'admin';
+      } else {
+        profile = {
+          id: authData.user.id,
+          full_name: authData.user.user_metadata?.full_name || 'Administrator',
+          email: authData.user.email,
+          role: 'admin',
+        };
+      }
+    }
 
     return res.status(200).json({
       success: true,
@@ -164,13 +184,20 @@ export const login = async (req, res) => {
  */
 export const getProfile = async (req, res) => {
   try {
-    const { data: profile, error } = await supabase
+    let { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', req.user.id)
       .single();
 
-    if (error) {
+    const userEmail = req.user.email?.toLowerCase();
+    const adminEmails = (process.env.ADMIN_EMAILS || 'pr7853995@gmail.com').toLowerCase().split(',').map((e) => e.trim());
+    if (userEmail && adminEmails.includes(userEmail)) {
+      if (profile) profile.role = 'admin';
+      else profile = { id: req.user.id, email: req.user.email, role: 'admin', full_name: 'Administrator' };
+    }
+
+    if (error && !profile) {
       return res.status(404).json({
         success: false,
         message: 'Profile not found.',

@@ -205,35 +205,35 @@ export default function ReportIssuePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans min-h-[calc(100vh-4rem)] flex-1 flex flex-col justify-center">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans min-h-[calc(100vh-4rem)] flex-1 flex flex-col justify-center bg-[#09090b] text-white">
       {/* Title */}
       <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-900/60 text-xs font-semibold uppercase tracking-wider mb-2 font-sans">
-          <Megaphone className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700/80 text-xs font-semibold uppercase tracking-wider mb-2 font-sans">
+          <Megaphone className="w-3.5 h-3.5 text-white" />
           <span>New Campus Facility Report</span>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl text-white">
+        <h1 className="font-serif text-3xl sm:text-4xl text-white font-bold tracking-tight">
           Document an Issue
         </h1>
-        <p className="font-sans text-sm text-slate-300 mt-1 font-normal">
+        <p className="font-sans text-sm text-zinc-400 mt-1 font-normal">
           Provide accurate photos and details. Gemini AI assists with categorization and checks for duplicate reports in real-time.
         </p>
       </div>
 
       {/* AUTOMATIC SIMILAR / DUPLICATE ISSUE DETECTION ALERT */}
       {duplicateMatches.length > 0 && !dismissDuplicates && (
-        <div className="mb-8 bg-amber-950/40 border-2 border-amber-800/60 rounded-2xl p-6 shadow-md space-y-4 font-sans">
+        <div className="mb-8 bg-zinc-900 border border-zinc-700 rounded-2xl p-6 shadow-md space-y-4 font-sans text-zinc-200">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 text-amber-300 font-bold text-base">
-              <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+            <div className="flex items-center gap-2.5 text-white font-bold text-base">
+              <AlertCircle className="w-5 h-5 text-white flex-shrink-0" />
               <span>This issue may already have been reported.</span>
             </div>
-            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-900/60 text-amber-300 border border-amber-700/60">
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
               {duplicateMatches.length} Possible Match{duplicateMatches.length > 1 ? 'es' : ''}
             </span>
           </div>
 
-          <p className="text-xs text-amber-200 leading-relaxed font-normal">
+          <p className="text-xs text-zinc-300 leading-relaxed font-normal">
             Our duplicate detection system identified existing student reports that closely match your description. Supporting an existing report unites student impact into one high-priority report.
           </p>
 
@@ -241,24 +241,24 @@ export default function ReportIssuePage() {
             {duplicateMatches.slice(0, 2).map((match, idx) => (
               <div
                 key={match.report.id || idx}
-                className="bg-slate-900 rounded-xl border border-amber-900/60 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+                className="bg-zinc-950 rounded-xl border border-zinc-800 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
               >
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-950/80 text-blue-300 border border-blue-900/60">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-700">
                       {match.report.category?.name || 'Facility'}
                     </span>
-                    <span className="text-xs font-semibold text-slate-300">
+                    <span className="text-xs font-semibold text-zinc-300">
                       📍 {match.report.location?.name} {match.report.custom_location ? `(${match.report.custom_location})` : ''}
                     </span>
                   </div>
                   <h4 className="font-bold text-white text-sm">{match.report.title}</h4>
-                  <p className="text-xs text-slate-400 line-clamp-1 mt-0.5 font-normal">{match.report.description}</p>
+                  <p className="text-xs text-zinc-400 line-clamp-1 mt-0.5 font-normal">{match.report.description}</p>
                 </div>
 
                 <Link
                   to={`/issue/${match.report.id}`}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors flex-shrink-0 text-center cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs transition-colors flex-shrink-0 text-center cursor-pointer"
                 >
                   View Existing Issue →
                 </Link>
@@ -266,14 +266,14 @@ export default function ReportIssuePage() {
             ))}
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-amber-900/60 text-xs">
-            <span className="text-amber-300">
+          <div className="flex items-center justify-between pt-2 border-t border-zinc-800 text-xs">
+            <span className="text-zinc-400">
               If your report is for a separate facility or room, you can proceed below.
             </span>
             <button
               type="button"
               onClick={() => setDismissDuplicates(true)}
-              className="text-amber-300 font-bold hover:underline cursor-pointer"
+              className="text-white font-bold hover:underline cursor-pointer"
             >
               Dismiss & Continue
             </button>
@@ -282,17 +282,17 @@ export default function ReportIssuePage() {
       )}
 
       {/* Main Form Card */}
-      <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-xl p-6 sm:p-8 font-sans">
+      <div className="bg-[#121214] rounded-2xl border border-zinc-800 shadow-xl p-6 sm:p-8 font-sans">
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-950/40 border border-red-900/50 text-red-300 text-sm flex items-start gap-2.5 font-medium">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div className="mb-6 p-4 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 text-sm flex items-start gap-2.5 font-medium">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-white" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 rounded-xl bg-emerald-950/40 border border-emerald-900/50 text-emerald-300 text-sm flex items-start gap-2.5 font-medium">
-            <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div className="mb-6 p-4 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 text-sm flex items-start gap-2.5 font-medium">
+            <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5 text-white" />
             <span>Report successfully submitted! Redirecting to issue page...</span>
           </div>
         )}
@@ -301,7 +301,7 @@ export default function ReportIssuePage() {
           {/* Title & AI Analyze Button */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
                 Issue Title <span className="text-red-400">*</span>
               </label>
 
@@ -309,9 +309,9 @@ export default function ReportIssuePage() {
                 type="button"
                 onClick={handleAIAnalyze}
                 disabled={analyzingAI || (!title.trim() && !description.trim())}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-950/60 hover:bg-blue-900/80 text-blue-300 border border-blue-800/60 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
               >
-                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                <Sparkles className="w-3.5 h-3.5 text-white" />
                 <span>{analyzingAI ? 'Gemini Analyzing...' : '✨ Analyze with Gemini AI'}</span>
               </button>
             </div>
@@ -322,24 +322,21 @@ export default function ReportIssuePage() {
               placeholder="e.g. Broken ceiling fan in Room 204 or Water cooler leaking in Block B"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder:text-slate-500 font-medium"
+              className="w-full px-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all placeholder:text-zinc-600 font-medium"
             />
           </div>
 
           {/* AI Suggestion Display Box */}
           {aiSuggestion && (
-            <div className="p-4 rounded-xl bg-blue-950/40 border border-blue-900/60 space-y-2.5 font-sans">
+            <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2.5 font-sans">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-blue-300 font-bold text-xs">
-                  <Sparkles className="w-4 h-4 text-blue-400" />
+                <div className="flex items-center gap-2 text-white font-bold text-xs">
+                  <Sparkles className="w-4 h-4 text-white" />
                   <span>Gemini AI Facility Suggestion</span>
                 </div>
-                <span className="text-[11px] font-semibold text-blue-300 bg-blue-900/80 px-2 py-0.5 rounded border border-blue-700/60">
-                  Suggested Severity: {aiSuggestion.suggested_severity}
-                </span>
               </div>
 
-              <p className="text-xs text-blue-200 font-medium leading-relaxed">
+              <p className="text-xs text-zinc-300 font-medium leading-relaxed">
                 "{aiSuggestion.summary}"
               </p>
             </div>
@@ -348,14 +345,14 @@ export default function ReportIssuePage() {
           {/* Category & Location Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
                 Facility Category <span className="text-red-400">*</span>
               </label>
               <select
                 required
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-medium"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all font-medium"
               >
                 <option value="">Select a category...</option>
                 {categories.map((c) => (
@@ -367,14 +364,14 @@ export default function ReportIssuePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
                 Campus Location <span className="text-red-400">*</span>
               </label>
               <select
                 required
                 value={locationId}
                 onChange={(e) => setLocationId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-medium"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all font-medium"
               >
                 <option value="">Select campus zone/building...</option>
                 {locations.map((loc) => (
@@ -388,18 +385,18 @@ export default function ReportIssuePage() {
 
           {/* Exact Room / Location Details */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
               Specific Room, Floor, or Landmark
             </label>
             <div className="relative">
-              <MapPin className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <MapPin className="w-5 h-5 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 required={locationId === 'other'}
                 placeholder="e.g. 2nd Floor, Room 204, near the east staircase"
                 value={customLocation}
                 onChange={(e) => setCustomLocation(e.target.value)}
-                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder:text-slate-500 font-medium"
+                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all placeholder:text-zinc-600 font-medium"
               />
             </div>
           </div>
@@ -407,11 +404,11 @@ export default function ReportIssuePage() {
           {/* Description */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
                 Detailed Description <span className="text-red-400">*</span>
               </label>
               <span className={`text-[11px] font-medium ${
-                description.length < 15 ? 'text-slate-500' : 'text-emerald-400'
+                description.length < 15 ? 'text-zinc-500' : 'text-white'
               }`}>
                 {description.length}/15 min chars
               </span>
@@ -422,38 +419,38 @@ export default function ReportIssuePage() {
               placeholder="Describe the condition, how long it has persisted, safety risks, or number of students prevented from using the facility..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-3.5 rounded-xl border border-slate-700 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder:text-slate-500 leading-relaxed font-normal"
+              className="w-full p-3.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all placeholder:text-zinc-600 leading-relaxed font-normal"
             />
           </div>
 
           {/* Date & Time Observed */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
                 Date Observed
               </label>
               <div className="relative">
-                <Calendar className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Calendar className="w-5 h-5 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="date"
                   value={incidentDate}
                   onChange={(e) => setIncidentDate(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-medium"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all font-medium"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
                 Approximate Time
               </label>
               <div className="relative">
-                <Clock className="w-5 h-5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Clock className="w-5 h-5 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="time"
                   value={incidentTime}
                   onChange={(e) => setIncidentTime(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-700 bg-slate-950 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-medium"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all font-medium"
                 />
               </div>
             </div>
@@ -461,19 +458,19 @@ export default function ReportIssuePage() {
 
           {/* Photo & Video Attachment */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
               Photo or Video Evidence (Max 25 MB per file, auto-compressed)
             </label>
             <ImageUploader files={files} setFiles={setFiles} />
           </div>
 
           {/* Anonymous Checkbox */}
-          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <ShieldAlert className="w-5 h-5 text-slate-400" />
+              <ShieldAlert className="w-5 h-5 text-zinc-400" />
               <div>
                 <p className="text-xs font-bold text-white">Submit Anonymously</p>
-                <p className="text-[11px] text-slate-400 font-normal">
+                <p className="text-[11px] text-zinc-400 font-normal">
                   Your student identity remains private while administration addresses the report.
                 </p>
               </div>
@@ -482,7 +479,7 @@ export default function ReportIssuePage() {
               type="checkbox"
               checked={isAnonymous}
               onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="w-5 h-5 rounded border-slate-700 text-emerald-600 focus:ring-emerald-500 bg-slate-900 cursor-pointer"
+              className="w-5 h-5 rounded border-zinc-700 text-white focus:ring-zinc-400 bg-zinc-900 cursor-pointer"
             />
           </div>
 
@@ -491,9 +488,9 @@ export default function ReportIssuePage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-semibold text-base shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-4 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-sans font-bold text-base shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-5 h-5 text-zinc-950" />
               <span>{submitting ? 'Submitting Report...' : 'Submit Campus Report'}</span>
             </button>
           </div>

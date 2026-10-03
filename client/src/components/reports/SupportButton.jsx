@@ -109,7 +109,7 @@ export default function SupportButton({
               <h3 className="font-serif text-xl font-bold text-white">Confirm You Are Affected</h3>
             </div>
             <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-normal">
-              Your verified student confirmation will increase the official severity metrics for administration review.
+              Your verified student confirmation will help prioritize this issue for administration review.
             </p>
 
             <div className="mb-4">

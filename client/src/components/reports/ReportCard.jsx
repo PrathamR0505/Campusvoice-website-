@@ -47,17 +47,7 @@ export default function ReportCard({ report }) {
           </div>
         )}
 
-        {/* Status Badge */}
-        <div className="absolute top-3 left-3 z-10">
-          <StatusBadge status={report.status} size="xs" />
-        </div>
 
-        {/* Severity indicator */}
-        {report.severity && (
-          <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-sans font-bold uppercase tracking-wider text-zinc-100 bg-zinc-900/90 border border-zinc-700 backdrop-blur-xs">
-            {report.severity}
-          </div>
-        )}
 
         {/* Media count pill if multiple */}
         {report.media && report.media.length > 1 && (

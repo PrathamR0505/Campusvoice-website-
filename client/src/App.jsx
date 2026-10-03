@@ -16,7 +16,6 @@ import ReportIssuePage from './pages/ReportIssuePage';
 import IssueFeedPage from './pages/IssueFeedPage';
 import IssueDetailsPage from './pages/IssueDetailsPage';
 import CampusMapPage from './pages/CampusMapPage';
-import TransparencyPage from './pages/TransparencyPage';
 import AdminDashboard from './pages/AdminDashboard';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -34,7 +33,6 @@ export default function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/feed" element={<IssueFeedPage />} />
-              <Route path="/transparency" element={<TransparencyPage />} />
 
               {/* Protected Routes */}
               <Route

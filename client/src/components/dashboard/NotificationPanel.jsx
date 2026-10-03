@@ -52,12 +52,12 @@ export default function NotificationPanel() {
       {/* Bell Button with Badge */}
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none cursor-pointer"
+        className="relative w-9 h-9 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/80 flex items-center justify-center transition-all focus:outline-none cursor-pointer shadow-sm"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-white text-zinc-950 text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -66,24 +66,24 @@ export default function NotificationPanel() {
       {/* Popup Drawer */}
       {open && (
         <div
-          className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-900"
+          className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#121214] border border-zinc-800 rounded-2xl shadow-2xl z-50 overflow-hidden text-white font-sans"
           onClick={() => setOpen(false)}
         >
-          <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
+          <div className="p-4 bg-zinc-950 border-b border-zinc-800 text-white flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-blue-400" />
-              <h4 className="font-bold text-sm">Notifications</h4>
+              <Bell className="w-4 h-4 text-white" />
+              <h4 className="font-bold text-sm font-serif">Notifications</h4>
             </div>
             {unreadCount > 0 && (
-              <span className="text-[11px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded">
+              <span className="text-[11px] font-bold bg-zinc-800 text-white border border-zinc-700 px-2 py-0.5 rounded-full">
                 {unreadCount} new
               </span>
             )}
           </div>
 
-          <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+          <div className="max-h-80 overflow-y-auto divide-y divide-zinc-800/60">
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-400">
+              <div className="p-6 text-center text-xs text-zinc-400 font-medium">
                 No notifications at this time.
               </div>
             ) : (
@@ -91,23 +91,23 @@ export default function NotificationPanel() {
                 <div
                   key={item.id}
                   className={`p-3.5 flex items-start justify-between gap-3 text-xs transition-colors ${
-                    !item.is_read ? 'bg-blue-50/50' : 'bg-white'
+                    !item.is_read ? 'bg-zinc-900/90' : 'bg-[#121214]'
                   }`}
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-900">{item.title}</span>
+                      <span className="font-bold text-white">{item.title}</span>
                       {!item.is_read && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-white" />
                       )}
                     </div>
-                    <p className="text-slate-600 leading-relaxed text-[11px]">
+                    <p className="text-zinc-300 leading-relaxed text-[11px] font-normal">
                       {item.message}
                     </p>
                     {item.report_id && (
                       <Link
                         to={`/issue/${item.report_id}`}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline pt-0.5"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-white hover:underline pt-0.5"
                       >
                         View Issue Details <ArrowRight className="w-3 h-3" />
                       </Link>
@@ -120,7 +120,7 @@ export default function NotificationPanel() {
                         e.stopPropagation();
                         handleMarkRead(item.id);
                       }}
-                      className="text-slate-400 hover:text-blue-600 p-1 flex-shrink-0"
+                      className="text-zinc-400 hover:text-white p-1 flex-shrink-0 cursor-pointer"
                       title="Mark as read"
                     >
                       <Check className="w-4 h-4" />

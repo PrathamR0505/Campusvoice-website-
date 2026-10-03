@@ -12,20 +12,20 @@ import {
 } from 'lucide-react';
 
 const iconByEvent = {
-  reported: { icon: FileText, color: 'text-red-500 bg-red-100' },
-  support_milestone: { icon: Users, color: 'text-blue-500 bg-blue-100' },
-  status_change: { icon: Clock, color: 'text-amber-500 bg-amber-100' },
-  admin_response: { icon: MessageSquare, color: 'text-indigo-500 bg-indigo-100' },
-  evidence_added: { icon: Camera, color: 'text-purple-500 bg-purple-100' },
-  action_initiated: { icon: Wrench, color: 'text-blue-500 bg-blue-100' },
-  resolved: { icon: CheckCircle2, color: 'text-emerald-500 bg-emerald-100' },
-  reopened: { icon: RotateCcw, color: 'text-orange-500 bg-orange-100' },
+  reported: { icon: FileText, color: 'text-red-400 bg-red-950/80 border border-red-800/60' },
+  support_milestone: { icon: Users, color: 'text-blue-400 bg-blue-950/80 border border-blue-800/60' },
+  status_change: { icon: Clock, color: 'text-amber-400 bg-amber-950/80 border border-amber-800/60' },
+  admin_response: { icon: MessageSquare, color: 'text-indigo-400 bg-indigo-950/80 border border-indigo-800/60' },
+  evidence_added: { icon: Camera, color: 'text-purple-400 bg-purple-950/80 border border-purple-800/60' },
+  action_initiated: { icon: Wrench, color: 'text-sky-400 bg-sky-950/80 border border-sky-800/60' },
+  resolved: { icon: CheckCircle2, color: 'text-emerald-400 bg-emerald-950/80 border border-emerald-800/60' },
+  reopened: { icon: RotateCcw, color: 'text-orange-400 bg-orange-950/80 border border-orange-800/60' },
 };
 
 export default function IssueTimeline({ updates = [] }) {
   if (!updates || updates.length === 0) {
     return (
-      <div className="py-6 text-center text-xs text-slate-500">
+      <div className="py-6 text-center text-xs text-zinc-500">
         No timeline events recorded yet.
       </div>
     );
@@ -37,11 +37,11 @@ export default function IssueTimeline({ updates = [] }) {
   );
 
   return (
-    <div className="relative pl-6 space-y-6 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+    <div className="relative pl-6 space-y-6 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-zinc-800">
       {sorted.map((item, idx) => {
         const eventConfig = iconByEvent[item.event_type] || {
           icon: AlertCircle,
-          color: 'text-slate-500 bg-slate-100',
+          color: 'text-zinc-400 bg-zinc-900 border border-zinc-700',
         };
         const Icon = eventConfig.icon;
 
@@ -59,27 +59,27 @@ export default function IssueTimeline({ updates = [] }) {
           <div key={item.id || idx} className="relative group">
             {/* Timeline node icon */}
             <div
-              className={`absolute -left-6 top-0.5 w-6 h-6 rounded-full flex items-center justify-center ring-4 ring-white shadow-xs ${eventConfig.color}`}
+              className={`absolute -left-6 top-0.5 w-6 h-6 rounded-full flex items-center justify-center ring-4 ring-[#121214] shadow-xs ${eventConfig.color}`}
             >
               <Icon className="w-3.5 h-3.5" />
             </div>
 
             {/* Event Content */}
-            <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 transition-colors group-hover:border-slate-300">
+            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-3.5 transition-colors group-hover:border-zinc-700">
               <div className="flex items-center justify-between gap-2 mb-1">
-                <h4 className="text-xs font-bold text-slate-900">{item.title}</h4>
-                <span className="text-[11px] font-medium text-slate-500 flex-shrink-0">
+                <h4 className="text-xs font-bold text-white">{item.title}</h4>
+                <span className="text-[11px] font-medium text-zinc-400 flex-shrink-0">
                   {dateStr} • {timeStr}
                 </span>
               </div>
               {item.description && (
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-zinc-300 leading-relaxed font-normal">
                   {item.description}
                 </p>
               )}
               {item.new_status && (
-                <div className="mt-2 text-[11px] text-slate-500">
-                  Status changed to: <strong className="text-slate-800">{item.new_status}</strong>
+                <div className="mt-2 text-[11px] text-zinc-400">
+                  Status changed to: <strong className="text-white capitalize">{item.new_status}</strong>
                 </div>
               )}
             </div>

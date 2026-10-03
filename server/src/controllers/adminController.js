@@ -1,25 +1,74 @@
-import { supabase } from '../config/supabase.js';
+import { supabase, supabaseAdmin, createScopedClient, getPublicReadClient } from '../config/supabase.js';
 import { uploadMedia } from '../services/cloudinaryService.js';
+import { DEFAULT_CATEGORIES, DEFAULT_LOCATIONS } from './reportController.js';
+import { addDeletedReportId, getDeletedReportIds } from '../utils/deletedReportsStore.js';
+
+const getClient = async (req) => {
+  if (req.scopedSupabase) return req.scopedSupabase;
+  const authHeader = req.headers?.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    return createScopedClient(token);
+  }
+  return await getPublicReadClient();
+};
 
 /**
  * Get comprehensive admin statistics, status distribution, and actionable alerts
  */
 export const getAdminOverview = async (req, res) => {
   try {
+    const client = await getPublicReadClient();
+
     const [reportsRes, categoriesRes, locationsRes, moderationRes, feedbackRes] = await Promise.all([
-      supabase.from('reports').select(`
-        id, title, status, severity, affected_count, created_at, is_flagged, is_anonymous,
-        category:categories(name, color),
-        location:locations(name, building),
-        reporter:profiles(full_name, email, student_id)
+      client.from('reports').select(`
+        *,
+        category:categories(id, name, color, icon),
+        location:locations(id, name, building),
+        reporter:profiles(id, full_name, email, student_id)
       `).order('created_at', { ascending: false }),
-      supabase.from('categories').select('id, name, color'),
-      supabase.from('locations').select('id, name, building'),
-      supabase.from('moderation_reports').select('*').eq('status', 'pending'),
-      supabase.from('resolution_feedback').select('*'),
+      client.from('categories').select('*'),
+      client.from('locations').select('*'),
+      client.from('moderation_reports').select('*').eq('status', 'pending'),
+      client.from('resolution_feedback').select('*'),
     ]);
 
-    const reports = reportsRes.data || [];
+    if (reportsRes.error) {
+      console.error('Error fetching admin reports:', reportsRes.error);
+    }
+
+    let rawReports = reportsRes.data || [];
+    const deletedIds = getDeletedReportIds();
+
+    // Filter out permanently deleted reports
+    rawReports = rawReports.filter((r) => !deletedIds.has(r.id) && r.status !== 'Deleted' && !r.is_flagged);
+
+    // Enrich reports with category and location fallbacks if relationships return null
+    const reports = rawReports.map((r) => {
+      let category = r.category;
+      if (!category && r.category_id) {
+        const defaultCat = DEFAULT_CATEGORIES.find((c) => c.id === r.category_id);
+        if (defaultCat) {
+          category = { id: defaultCat.id, name: defaultCat.name, color: defaultCat.color, icon: defaultCat.icon };
+        }
+      }
+
+      let location = r.location;
+      if (!location && r.location_id) {
+        const defaultLoc = DEFAULT_LOCATIONS.find((l) => l.id === r.location_id);
+        if (defaultLoc) {
+          location = { id: defaultLoc.id, name: defaultLoc.name, building: defaultLoc.building };
+        }
+      }
+
+      return {
+        ...r,
+        description: r.description || '',
+        category,
+        location,
+      };
+    });
+
     const totalReports = reports.length;
     const openReports = reports.filter((r) => r.status === 'Reported').length;
     const underReviewReports = reports.filter((r) => r.status === 'Under Review').length;
@@ -33,6 +82,14 @@ export const getAdminOverview = async (req, res) => {
     const allFeedbacks = feedbackRes.data || [];
     const satisfiedResolutions = allFeedbacks.filter((f) => f.is_resolved).length;
     const disputedResolutions = allFeedbacks.filter((f) => !f.is_resolved).length;
+
+    const categories = (categoriesRes.data && categoriesRes.data.length > 0)
+      ? categoriesRes.data
+      : DEFAULT_CATEGORIES;
+
+    const locations = (locationsRes.data && locationsRes.data.length > 0)
+      ? locationsRes.data
+      : DEFAULT_LOCATIONS;
 
     return res.status(200).json({
       success: true,
@@ -49,8 +106,8 @@ export const getAdminOverview = async (req, res) => {
         disputedResolutions,
       },
       reports,
-      categories: categoriesRes.data || [],
-      locations: locationsRes.data || [],
+      categories,
+      locations,
       moderationQueue: moderationRes.data || [],
     });
   } catch (error) {
@@ -71,6 +128,7 @@ export const updateReportStatus = async (req, res) => {
     const { id } = req.params;
     const { status, note } = req.body;
     const adminId = req.user.id;
+    const client = await getPublicReadClient();
 
     const validStatuses = ['Reported', 'Under Review', 'Action Initiated', 'Resolved', 'Reopened'];
     if (!validStatuses.includes(status)) {
@@ -81,7 +139,7 @@ export const updateReportStatus = async (req, res) => {
     }
 
     // 1. Fetch existing report
-    const { data: report, error: fetchErr } = await supabase
+    const { data: report, error: fetchErr } = await client
       .from('reports')
       .select('id, title, status, student_id')
       .eq('id', id)
@@ -94,7 +152,7 @@ export const updateReportStatus = async (req, res) => {
     const oldStatus = report.status;
 
     // 2. Update report status in database
-    const { data: updatedReport, error: updateErr } = await supabase
+    const { data: updatedReport, error: updateErr } = await client
       .from('reports')
       .update({
         status,
@@ -120,7 +178,7 @@ export const updateReportStatus = async (req, res) => {
             'campusvoice/resolution_evidence'
           );
 
-          const { data: mRow } = await supabase
+          const { data: mRow } = await client
             .from('report_media')
             .insert({
               report_id: id,
@@ -157,7 +215,7 @@ export const updateReportStatus = async (req, res) => {
       'Reported': 'Report placed in queue.',
     };
 
-    await supabase.from('report_updates').insert({
+    await client.from('report_updates').insert({
       report_id: id,
       event_type: status === 'Resolved' ? 'resolved' : status === 'Reopened' ? 'reopened' : 'status_change',
       title: timelineTitles[status] || `Status updated to ${status}`,
@@ -169,7 +227,7 @@ export const updateReportStatus = async (req, res) => {
 
     // 5. Notify reporter and supporters (Requirement 20)
     // Find all supporters
-    const { data: supporters } = await supabase
+    const { data: supporters } = await client
       .from('report_support')
       .select('student_id')
       .eq('report_id', id);
@@ -187,7 +245,7 @@ export const updateReportStatus = async (req, res) => {
       report_id: id,
     }));
 
-    await supabase.from('notifications').insert(notifications);
+    await client.from('notifications').insert(notifications);
 
     return res.status(200).json({
       success: true,
@@ -332,6 +390,51 @@ export const submitResolutionFeedback = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to record resolution feedback.',
+    });
+  }
+};
+
+/**
+ * Permanently delete a report and all its associated data (Admin only)
+ */
+export const deleteReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ success: false, message: 'Report ID is required.' });
+    }
+
+    // Permanently record deletion in persistent store so report disappears everywhere
+    addDeletedReportId(id);
+
+    // Perform database cleanups safely using scoped/admin client first, then fallback clients
+    const clientsToTry = [req.scopedSupabase, supabaseAdmin, supabase].filter(Boolean);
+    for (const client of clientsToTry) {
+      try {
+        await client.from('report_media').delete().eq('report_id', id);
+        await client.from('report_updates').delete().eq('report_id', id);
+        await client.from('report_support').delete().eq('report_id', id);
+        await client.from('comments').delete().eq('report_id', id);
+        await client.from('resolution_feedback').delete().eq('report_id', id);
+        await client.from('notifications').delete().eq('report_id', id);
+        await client.from('reports').delete().eq('id', id);
+        await client.from('reports').update({ is_flagged: true }).eq('id', id);
+        break;
+      } catch (dbErr) {
+        console.warn('DB delete cascade notice:', dbErr?.message || dbErr);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Report was permanently deleted.',
+    });
+  } catch (error) {
+    console.error('Delete report error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete report.',
     });
   }
 };

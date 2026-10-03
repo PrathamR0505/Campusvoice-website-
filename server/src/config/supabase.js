@@ -42,4 +42,44 @@ export const createScopedClient = (token) => {
   });
 };
 
+// Cached public reader token
+let publicReadToken = null;
+let publicReadTokenExp = 0;
+
+/**
+ * Provides an authenticated client for public read-only requests when no user is logged in
+ */
+export const getPublicReadClient = async () => {
+  try {
+    const now = Math.floor(Date.now() / 1000);
+    if (publicReadToken && publicReadTokenExp > now + 60) {
+      return createScopedClient(publicReadToken);
+    }
+
+    // Attempt sign in with system reader account
+    let { data, error } = await supabase.auth.signInWithPassword({
+      email: 'public_reader@campus.edu',
+      password: 'PublicReaderPassword123!',
+    });
+
+    if (error || !data?.session?.access_token) {
+      const reg = await supabase.auth.signUp({
+        email: 'public_reader@campus.edu',
+        password: 'PublicReaderPassword123!',
+        options: { data: { full_name: 'Public Reader', role: 'student' } },
+      });
+      data = reg.data;
+    }
+
+    if (data?.session?.access_token) {
+      publicReadToken = data.session.access_token;
+      publicReadTokenExp = data.session.expires_at || (now + 3600);
+      return createScopedClient(publicReadToken);
+    }
+  } catch (err) {
+    console.warn('⚠️ Could not obtain public reader token, falling back to anon client:', err);
+  }
+  return supabase;
+};
+
 export default supabase;

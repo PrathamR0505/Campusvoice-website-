@@ -4,6 +4,7 @@ import {
   updateReportStatus,
   uploadResolutionEvidence,
   submitResolutionFeedback,
+  deleteReport,
 } from '../controllers/adminController.js';
 import { requireAuth, requireAdmin } from '../middleware/authMiddleware.js';
 import { uploadMediaMiddleware } from '../middleware/uploadMiddleware.js';
@@ -17,5 +18,6 @@ router.use(requireAdmin);
 router.get('/overview', getAdminOverview);
 router.put('/reports/:id/status', uploadMediaMiddleware.array('evidence', 4), updateReportStatus);
 router.post('/reports/:id/evidence', uploadMediaMiddleware.array('evidence', 4), uploadResolutionEvidence);
+router.delete('/reports/:id', deleteReport);
 
 export default router;

@@ -9,7 +9,7 @@ export default function ProtectedRoute({ children, requiredRole = null }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
         <LoadingSpinner size="lg" text="Verifying campus credentials..." />
       </div>
     );

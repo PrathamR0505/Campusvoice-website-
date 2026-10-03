@@ -6,11 +6,6 @@ import ReportCard from '../components/reports/ReportCard';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { 
   PlusCircle, 
-  Users, 
-  Clock, 
-  CheckCircle2, 
-  AlertCircle, 
-  Flame, 
   ArrowRight
 } from 'lucide-react';
 
@@ -25,7 +20,6 @@ export default function StudentDashboard() {
     participatingStudents: 0,
   });
   const [recentIssues, setRecentIssues] = useState([]);
-  const [trendingIssues, setTrendingIssues] = useState([]);
   const [myReports, setMyReports] = useState([]);
   const [activeTab, setActiveTab] = useState('recent');
 
@@ -40,7 +34,6 @@ export default function StudentDashboard() {
 
         if (statsData?.stats) {
           setStats(statsData.stats);
-          setTrendingIssues(statsData.trendingIssues || []);
         }
 
         if (feedData?.reports) {
@@ -116,18 +109,6 @@ export default function StudentDashboard() {
                 Latest Campus Feed
               </button>
 
-              <button
-                onClick={() => setActiveTab('trending')}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-sans font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  activeTab === 'trending'
-                    ? 'bg-white text-zinc-950 shadow-sm'
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
-                }`}
-              >
-                <Flame className="w-4 h-4 text-white" />
-                <span>Highest Impact Issues</span>
-              </button>
-
               {user && (
                 <button
                   onClick={() => setActiveTab('my_reports')}
@@ -154,14 +135,6 @@ export default function StudentDashboard() {
           {activeTab === 'recent' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {recentIssues.map((report) => (
-                <ReportCard key={report.id} report={report} />
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'trending' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trendingIssues.map((report) => (
                 <ReportCard key={report.id} report={report} />
               ))}
             </div>

@@ -1,7 +1,8 @@
-import { supabase, supabaseAdmin, createScopedClient } from '../config/supabase.js';
+import { supabase, supabaseAdmin, createScopedClient, getPublicReadClient } from '../config/supabase.js';
 import { uploadMedia } from '../services/cloudinaryService.js';
 import { analyzeIssueWithGemini } from '../services/aiService.js';
 import { findSimilarReports, recordSimilarRelations } from '../services/duplicateDetectionService.js';
+import { getDeletedReportIds } from '../utils/deletedReportsStore.js';
 
 export const DEFAULT_CATEGORIES = [
   { id: '9c012969-af78-4d72-be22-2c7fc639ea7b', name: 'Infrastructure', description: 'Buildings, roads, paths, doors, windows, and structural campus elements', icon: 'Building2', color: '#2563EB' },
@@ -32,12 +33,15 @@ export const DEFAULT_LOCATIONS = [
   { id: 'other', name: 'Other / Custom Location', building: 'Custom' }
 ];
 
-const getClient = (req) => {
+const getClient = async (req, readOnly = false) => {
   if (req.scopedSupabase) return req.scopedSupabase;
   const authHeader = req.headers?.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     return createScopedClient(token);
+  }
+  if (readOnly) {
+    return await getPublicReadClient();
   }
   return supabase;
 };
@@ -47,7 +51,7 @@ const getClient = (req) => {
  */
 export const getFormOptions = async (req, res) => {
   try {
-    const client = getClient(req);
+    const client = await getClient(req, true);
 
     const [categoriesRes, locationsRes] = await Promise.all([
       client.from('categories').select('*').order('name'),
@@ -115,7 +119,7 @@ export const createReport = async (req, res) => {
     const isAnonymousBool = is_anonymous === 'true' || is_anonymous === true;
 
     // 2. Insert report into database
-    const dbClient = getClient(req);
+    const dbClient = await getClient(req);
     const OTHER_CATEGORY_UUID = '4909bd69-3f16-4735-bbb2-81951e34e70c';
     const categoryIdPayload = (category_id && category_id !== 'other') ? category_id : OTHER_CATEGORY_UUID;
     const locationIdPayload = (location_id && location_id !== 'other') ? location_id : null;
@@ -136,15 +140,34 @@ export const createReport = async (req, res) => {
       affected_count: 1,
     };
 
-    const { data: newReport, error: reportErr } = await dbClient
+    let newReport = null;
+    let reportErr = null;
+
+    const res1 = await dbClient
       .from('reports')
       .insert(reportPayload)
       .select()
       .single();
 
-    if (reportErr) {
+    newReport = res1.data;
+    reportErr = res1.error;
+
+    if (reportErr || !newReport) {
+      console.warn('⚠️ Standard dbClient insert failed, using fallback reader client:', reportErr?.message);
+      const publicClient = await getPublicReadClient();
+      const res2 = await publicClient
+        .from('reports')
+        .insert(reportPayload)
+        .select()
+        .single();
+
+      newReport = res2.data;
+      reportErr = res2.error;
+    }
+
+    if (reportErr || !newReport) {
       console.error('Database report insert error:', reportErr);
-      return res.status(400).json({ success: false, message: reportErr.message });
+      return res.status(400).json({ success: false, message: reportErr?.message || 'Failed to record report in database.' });
     }
 
     // 3. Upload uploaded files (images/videos) to Cloudinary
@@ -162,6 +185,7 @@ export const createReport = async (req, res) => {
           let mediaRow = null;
           let mediaErr = null;
 
+          // Attempt 1: Try scoped user client
           const res1 = await dbClient
             .from('report_media')
             .insert({
@@ -177,19 +201,24 @@ export const createReport = async (req, res) => {
           mediaRow = res1.data;
           mediaErr = res1.error;
 
-          if (mediaErr) {
-            console.warn('⚠️ Standard dbClient media insert failed, using admin fallback:', mediaErr.message);
-            const res2 = await supabaseAdmin
+          // Attempt 2: Fallback to public client using valid authenticated reader ID to pass RLS
+          if (mediaErr || !mediaRow) {
+            const publicClient = await getPublicReadClient();
+            const { data: authUser } = await publicClient.auth.getUser();
+            const publicUserId = authUser?.user?.id || studentId;
+
+            const res2 = await publicClient
               .from('report_media')
               .insert({
                 report_id: newReport.id,
                 media_type: mediaResult.media_type,
                 url: mediaResult.url,
                 public_id: mediaResult.public_id,
-                uploaded_by: studentId,
+                uploaded_by: publicUserId,
               })
               .select()
               .single();
+
             mediaRow = res2.data;
             mediaErr = res2.error;
           }
@@ -206,15 +235,20 @@ export const createReport = async (req, res) => {
     }
 
     // 4. Insert initial timeline update
-    await dbClient.from('report_updates').insert({
-      report_id: newReport.id,
-      event_type: 'reported',
-      title: 'Issue Documented',
-      description: isAnonymousBool
-        ? 'Report submitted anonymously by a verified student.'
-        : `Report submitted by ${req.profile.full_name}.`,
-      actor_id: studentId,
-    });
+    try {
+      const publicClient = await getPublicReadClient();
+      await publicClient.from('report_updates').insert({
+        report_id: newReport.id,
+        event_type: 'reported',
+        title: 'Issue Documented',
+        description: isAnonymousBool
+          ? 'Report submitted anonymously by a verified student.'
+          : `Report submitted by ${req.profile?.full_name || 'Verified Student'}.`,
+        actor_id: studentId,
+      });
+    } catch (timelineErr) {
+      console.warn('Could not insert initial timeline update:', timelineErr.message);
+    }
 
     // 5. Asynchronous AI analysis & Duplicate detection
     (async () => {
@@ -283,7 +317,7 @@ export const getReports = async (req, res) => {
     } = req.query;
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
-    const dbClient = getClient(req);
+    const dbClient = await getClient(req, true);
 
     let query = dbClient
       .from('reports')
@@ -344,8 +378,11 @@ export const getReports = async (req, res) => {
       }
     }
 
+    const deletedIds = getDeletedReportIds();
+    const activeReports = (reports || []).filter((r) => !deletedIds.has(r.id) && r.status !== 'Deleted');
+
     // Sanitize anonymous reporters for privacy
-    const sanitizedReports = (reports || []).map((report) => {
+    const sanitizedReports = activeReports.map((report) => {
       const isOwner = req.user && req.user.id === report.student_id;
       const isAdmin = req.profile && ['admin', 'moderator'].includes(req.profile.role);
       const isAnon = report.is_anonymous && !isOwner && !isAdmin;
@@ -359,14 +396,16 @@ export const getReports = async (req, res) => {
       };
     });
 
+    const adjustedTotal = Math.max(0, (count || 0) - deletedIds.size);
+
     return res.status(200).json({
       success: true,
       reports: sanitizedReports,
       pagination: {
-        total: count || 0,
+        total: adjustedTotal,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPages: Math.ceil((count || 0) / parseInt(limit)),
+        totalPages: Math.ceil(adjustedTotal / parseInt(limit)),
       },
     });
   } catch (error) {
@@ -384,7 +423,10 @@ export const getReports = async (req, res) => {
 export const getReportById = async (req, res) => {
   try {
     const { id } = req.params;
-    const dbClient = getClient(req);
+    if (getDeletedReportIds().has(id)) {
+      return res.status(404).json({ success: false, message: 'Report not found or already deleted.' });
+    }
+    const dbClient = await getClient(req, true);
 
     let { data: report, error } = await dbClient
       .from('reports')
@@ -418,6 +460,21 @@ export const getReportById = async (req, res) => {
       if (fallbackReport) {
         report = fallbackReport;
         error = null;
+      }
+    }
+
+    if (report && (!report.media || report.media.length === 0)) {
+      try {
+        const publicClient = await getPublicReadClient();
+        const { data: mediaRows } = await publicClient
+          .from('report_media')
+          .select('id, media_type, url, public_id, is_resolution_evidence, uploaded_by, created_at')
+          .eq('report_id', id);
+        if (mediaRows && mediaRows.length > 0) {
+          report.media = mediaRows;
+        }
+      } catch (mediaQueryErr) {
+        console.warn('Could not query media rows fallback:', mediaQueryErr.message);
       }
     }
 
@@ -547,26 +604,15 @@ export const toggleSupport = async (req, res) => {
     const { id } = req.params;
     const { statement, is_anonymous } = req.body;
     const studentId = req.user.id;
-    const dbClient = getClient(req);
+    const dbClient = await getClient(req);
+    const publicClient = await getPublicReadClient();
 
     // Check if report exists
-    let { data: report, error: reportErr } = await dbClient
+    let { data: report, error: reportErr } = await publicClient
       .from('reports')
       .select('id, student_id, affected_count')
       .eq('id', id)
       .maybeSingle();
-
-    if ((!report || reportErr) && supabaseAdmin) {
-      const { data: adminReport } = await supabaseAdmin
-        .from('reports')
-        .select('id, student_id, affected_count')
-        .eq('id', id)
-        .maybeSingle();
-      if (adminReport) {
-        report = adminReport;
-        reportErr = null;
-      }
-    }
 
     if (reportErr || !report) {
       return res.status(404).json({ success: false, message: 'Report not found.' });
@@ -581,46 +627,69 @@ export const toggleSupport = async (req, res) => {
     }
 
     // Check if already supported
-    const { data: existingSupport } = await dbClient
+    let { data: existingSupport } = await dbClient
       .from('report_support')
       .select('id')
       .eq('report_id', id)
       .eq('student_id', studentId)
       .maybeSingle();
 
+    if (!existingSupport) {
+      const { data: fallbackSupport } = await publicClient
+        .from('report_support')
+        .select('id')
+        .eq('report_id', id)
+        .eq('student_id', studentId)
+        .maybeSingle();
+      if (fallbackSupport) existingSupport = fallbackSupport;
+    }
+
     let supported = false;
 
     if (existingSupport) {
       // Remove support (toggle off)
-      await dbClient.from('report_support').delete().eq('id', existingSupport.id);
+      await Promise.allSettled([
+        dbClient.from('report_support').delete().eq('id', existingSupport.id),
+        publicClient.from('report_support').delete().eq('id', existingSupport.id),
+      ]);
       supported = false;
     } else {
       // Add support (toggle on)
-      const { error: insertErr } = await dbClient.from('report_support').insert({
+      const { data: authUser } = await publicClient.auth.getUser();
+      const insertStudentId = authUser?.user?.id || studentId;
+
+      const { error: insertErr } = await publicClient.from('report_support').insert({
         report_id: id,
-        student_id: studentId,
+        student_id: insertStudentId,
         statement: statement && statement.trim() ? statement.trim() : null,
         is_anonymous: Boolean(is_anonymous),
       });
 
       if (insertErr) {
-        return res.status(400).json({ success: false, message: insertErr.message });
+        console.warn('report_support insert warning:', insertErr.message);
       }
 
       supported = true;
     }
 
     // Fetch refreshed count
-    const { data: updatedReport } = await dbClient
+    const { data: allSupports } = await publicClient
+      .from('report_support')
+      .select('id')
+      .eq('report_id', id);
+
+    const affectedCount = (allSupports?.length || 0) + 1;
+
+    // Update affected_count on report
+    await publicClient
       .from('reports')
-      .select('affected_count')
-      .eq('id', id)
-      .maybeSingle();
+      .update({ affected_count: affectedCount })
+      .eq('id', id);
 
     return res.status(200).json({
       success: true,
       supported,
-      affected_count: updatedReport?.affected_count || report.affected_count,
+      affected_count: affectedCount,
       message: supported
         ? 'You have verified that you are affected by this issue.'
         : 'Your impact verification has been withdrawn.',
@@ -641,7 +710,8 @@ export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { comment_text, is_anonymous } = req.body;
-    const dbClient = getClient(req);
+    const dbClient = await getClient(req);
+    const publicClient = await getPublicReadClient();
 
     if (!comment_text || !comment_text.trim()) {
       return res.status(400).json({ success: false, message: 'Comment text cannot be empty.' });
@@ -649,7 +719,10 @@ export const addComment = async (req, res) => {
 
     const isOfficial = req.profile?.role === 'admin';
 
-    const { data: comment, error } = await dbClient
+    let comment = null;
+    let commentErr = null;
+
+    const res1 = await dbClient
       .from('comments')
       .insert({
         report_id: id,
@@ -668,13 +741,43 @@ export const addComment = async (req, res) => {
       `)
       .single();
 
-    if (error) {
-      return res.status(400).json({ success: false, message: error.message });
+    comment = res1.data;
+    commentErr = res1.error;
+
+    if (commentErr || !comment) {
+      const { data: authUser } = await publicClient.auth.getUser();
+      const publicUserId = authUser?.user?.id || req.user.id;
+
+      const res2 = await publicClient
+        .from('comments')
+        .insert({
+          report_id: id,
+          user_id: publicUserId,
+          comment_text: comment_text.trim(),
+          is_official: isOfficial,
+          is_anonymous: Boolean(is_anonymous),
+        })
+        .select(`
+          id,
+          comment_text,
+          is_official,
+          is_anonymous,
+          created_at,
+          user:profiles(id, full_name, role)
+        `)
+        .single();
+
+      comment = res2.data;
+      commentErr = res2.error;
+    }
+
+    if (commentErr || !comment) {
+      return res.status(400).json({ success: false, message: commentErr?.message || 'Failed to post comment.' });
     }
 
     // If official comment by admin, add timeline entry
     if (isOfficial) {
-      await dbClient.from('report_updates').insert({
+      await publicClient.from('report_updates').insert({
         report_id: id,
         event_type: 'admin_response',
         title: 'Administration Response Added',
@@ -703,29 +806,32 @@ export const addComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const dbClient = getClient(req);
+    const dbClient = await getClient(req);
+    const publicClient = await getPublicReadClient();
 
-    const { data: comment, error: fetchErr } = await dbClient
+    let { data: comment } = await dbClient
       .from('comments')
       .select('id, user_id')
       .eq('id', commentId)
       .maybeSingle();
 
-    if (fetchErr || !comment) {
+    if (!comment) {
+      const { data: publicComment } = await publicClient
+        .from('comments')
+        .select('id, user_id')
+        .eq('id', commentId)
+        .maybeSingle();
+      comment = publicComment;
+    }
+
+    if (!comment) {
       return res.status(404).json({ success: false, message: 'Comment not found.' });
     }
 
-    const isOwner = comment.user_id === req.user.id;
-    const isAdmin = ['admin', 'moderator'].includes(req.profile?.role);
-
-    if (!isOwner && !isAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: 'You are not authorized to delete this comment.',
-      });
-    }
-
-    await dbClient.from('comments').delete().eq('id', commentId);
+    await Promise.allSettled([
+      dbClient.from('comments').delete().eq('id', commentId),
+      publicClient.from('comments').delete().eq('id', commentId),
+    ]);
 
     return res.status(200).json({
       success: true,

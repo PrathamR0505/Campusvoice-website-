@@ -121,15 +121,6 @@ export default function IssueDetailsPage() {
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
-
-        <div className="flex items-center gap-2">
-          <StatusBadge status={report.status} size="sm" />
-          {report.severity && (
-            <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-zinc-100 bg-zinc-900 border border-zinc-700">
-              {report.severity} Severity
-            </span>
-          )}
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -322,43 +313,6 @@ export default function IssueDetailsPage() {
             </div>
           </div>
 
-          {/* Resolution Verification */}
-          {report.status === 'Resolved' && (
-            <div className="bg-[#121214] border border-zinc-800 rounded-2xl p-6 space-y-3 font-sans">
-              <div className="flex items-center gap-2 text-white font-bold text-sm">
-                <CheckCircle2 className="w-5 h-5 text-white" />
-                <span>Resolution Verification</span>
-              </div>
-              <p className="text-xs text-zinc-300 leading-relaxed font-normal">
-                Administration marked this issue resolved. Has this facility actually been fixed to satisfactory working order?
-              </p>
-
-              {verificationFeedback ? (
-                <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 text-xs font-semibold text-zinc-200">
-                  {verificationFeedback.is_resolved
-                    ? '✅ You verified this issue as resolved.'
-                    : '❌ You confirmed this is still an active issue.'}
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <button
-                    onClick={() => handleResolutionFeedback(true)}
-                    disabled={verifying}
-                    className="py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs transition-colors cursor-pointer"
-                  >
-                    ✅ Yes, resolved
-                  </button>
-                  <button
-                    onClick={() => handleResolutionFeedback(false)}
-                    disabled={verifying}
-                    className="py-2.5 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 transition-colors cursor-pointer"
-                  >
-                    ❌ Still an issue
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Issue Automated Timeline */}
           <div className="bg-[#121214] rounded-2xl border border-zinc-800 shadow-lg p-6 space-y-4 font-sans">

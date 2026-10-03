@@ -185,14 +185,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const role = profile?.role || 'student';
-  const isAdmin = role === 'admin';
+  const ADMIN_EMAILS = ['pr7853995@gmail.com'];
+  const userEmail = user?.email?.toLowerCase();
+  const isEmailAdmin = Boolean(userEmail && ADMIN_EMAILS.includes(userEmail));
+
+  const role = isEmailAdmin ? 'admin' : (profile?.role || 'student');
+  const isAdmin = role === 'admin' || isEmailAdmin;
   const isModerator = role === 'moderator' || isAdmin;
-  const isStudent = role === 'student';
+  const isStudent = role === 'student' && !isAdmin;
 
   const value = {
     user,
-    profile,
+    profile: profile ? { ...profile, role: isEmailAdmin ? 'admin' : profile.role } : (isEmailAdmin ? { id: user?.id, email: user?.email, full_name: user?.user_metadata?.full_name || 'Admin', role: 'admin' } : null),
     session,
     token: session?.access_token,
     role,

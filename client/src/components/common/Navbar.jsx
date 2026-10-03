@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import NotificationPanel from '../dashboard/NotificationPanel';
 import { 
   Megaphone, 
   PlusCircle, 
@@ -32,24 +31,24 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-xl text-white font-sans">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="relative flex items-center justify-between h-20">
           
           {/* Logo & Brand Header */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 z-10">
             <Link to="/" className="flex items-center gap-3.5 group">
               <div className="flex flex-col">
                 <span className="font-serif text-2xl font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">
                   CampusVoice
                 </span>
                 <span className="font-sans text-xs text-zinc-400 font-medium tracking-wide">
-                  Student–Powered Transparency
+                  Speak. Document. Demand.
                 </span>
               </div>
             </Link>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-zinc-900 border border-zinc-800 font-sans">
+          {/* Desktop Navigation Links - Centered */}
+          <div className="hidden md:flex items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-1 p-1 rounded-xl bg-zinc-900 border border-zinc-800 font-sans z-10 shadow-sm">
             {user ? (
               <>
                 <Link
@@ -86,17 +85,7 @@ export default function Navbar() {
                   Campus Map
                 </Link>
 
-                <Link
-                  to="/transparency"
-                  className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 ${
-                    isActive('/transparency')
-                      ? 'bg-zinc-800 text-white shadow-sm'
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
-                  }`}
-                >
-                  <BarChart3 className="w-3.5 h-3.5 text-zinc-300" />
-                  Transparency
-                </Link>
+
 
                 {isAdmin && (
                   <Link
@@ -124,41 +113,34 @@ export default function Navbar() {
                 >
                   Campus Map
                 </Link>
-                <Link
-                  to="/transparency"
-                  className="px-3.5 py-2 rounded-lg text-sm font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800/60 transition-colors"
-                >
-                  Transparency
-                </Link>
+
               </>
             )}
           </div>
 
           {/* Desktop Right Action Area */}
-          <div className="hidden md:flex items-center gap-3 font-sans">
+          <div className="hidden md:flex items-center gap-3 font-sans z-10">
             {user ? (
               <>
                 <Link
                   to="/report"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-colors shadow-sm"
+                  className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-white text-zinc-950 font-bold text-sm hover:bg-zinc-200 transition-all shadow-sm"
                 >
-                  <PlusCircle className="w-4 h-4 text-black" />
+                  <PlusCircle className="w-4.5 h-4.5 text-zinc-950 stroke-[2.2]" />
                   Report Issue
                 </Link>
-
-                <NotificationPanel />
 
                 <div className="relative">
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2.5 p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800 focus:outline-none cursor-pointer"
+                    className="flex items-center gap-3 p-1.5 px-3 rounded-xl bg-zinc-900/90 hover:bg-zinc-800/90 transition-all border border-zinc-800 hover:border-zinc-700/80 focus:outline-none cursor-pointer"
                     aria-label="User menu"
                   >
-                    <div className="w-8 h-8 rounded-full bg-zinc-800 text-white flex items-center justify-center text-xs font-bold border border-zinc-700">
+                    <div className="w-8 h-8 rounded-full bg-zinc-800 text-white flex items-center justify-center text-xs font-bold border border-zinc-700/80">
                       {profile?.full_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
                     </div>
                     <div className="text-left hidden lg:block pr-1">
-                      <p className="text-xs font-semibold text-white truncate max-w-[120px]">
+                      <p className="text-xs font-bold text-white truncate max-w-[120px]">
                         {profile?.full_name || 'Student'}
                       </p>
                       <p className="text-[10px] text-zinc-400 capitalize font-medium">
@@ -169,20 +151,20 @@ export default function Navbar() {
 
                   {userDropdownOpen && (
                     <div
-                      className="absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl py-2 z-50 font-sans"
+                      className="absolute right-0 mt-2 w-56 bg-[#121214] border border-zinc-800 rounded-xl shadow-2xl py-2 z-50 font-sans"
                       onClick={() => setUserDropdownOpen(false)}
                     >
-                      <div className="px-4 py-2 border-b border-zinc-800">
+                      <div className="px-4 py-2.5 border-b border-zinc-800/80">
                         <p className="text-sm font-bold text-white truncate">{profile?.full_name}</p>
                         <p className="text-xs text-zinc-400 truncate">{user.email}</p>
-                        <span className="inline-block mt-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
+                        <span className="inline-block mt-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-700/80">
                           {profile?.student_id || profile?.role}
                         </span>
                       </div>
 
                       <Link
                         to="/profile"
-                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors font-semibold"
+                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-colors font-semibold"
                       >
                         <User className="w-4 h-4 text-zinc-400" />
                         My Profile
@@ -190,13 +172,23 @@ export default function Navbar() {
 
                       <Link
                         to="/dashboard"
-                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors font-semibold"
+                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-colors font-semibold"
                       >
                         <Layers className="w-4 h-4 text-zinc-400" />
                         Student Dashboard
                       </Link>
 
-                      <div className="my-1 border-t border-zinc-800" />
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-2.5 px-4 py-2 text-sm text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors font-bold border-t border-b border-zinc-800/80 my-1 py-2.5"
+                        >
+                          <ShieldCheck className="w-4.5 h-4.5 text-amber-400" />
+                          Admin Control Panel
+                        </Link>
+                      )}
+
+                      <div className="my-1 border-t border-zinc-800/80" />
 
                       <button
                         onClick={handleLogout}
@@ -281,13 +273,7 @@ export default function Navbar() {
               >
                 Campus Map
               </Link>
-              <Link
-                to="/transparency"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-base font-semibold text-zinc-300 hover:text-white hover:bg-zinc-800"
-              >
-                Transparency Stats
-              </Link>
+
               {isAdmin && (
                 <Link
                   to="/admin"
@@ -327,13 +313,7 @@ export default function Navbar() {
               >
                 Browse Reports
               </Link>
-              <Link
-                to="/transparency"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-base font-semibold text-zinc-300 hover:text-white hover:bg-zinc-800"
-              >
-                Transparency Stats
-              </Link>
+
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}

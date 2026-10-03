@@ -39,11 +39,7 @@ export default function LoginPage() {
     }
   };
 
-  const fillCredentials = (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    setError('');
-  };
+
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-[#09090b] font-sans">
@@ -147,31 +143,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Quick Demo Login Preset Buttons */}
-          <div className="mt-6 pt-4 border-t border-zinc-800 space-y-2 font-sans">
-            <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-              Quick One-Click Demo Sign In:
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => fillCredentials('student@campus.edu', 'Student123!')}
-                className="py-1.5 px-2.5 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-zinc-700 text-zinc-300 text-xs text-left cursor-pointer font-medium"
-              >
-                <span className="font-bold text-white block">Student Demo</span>
-                <span className="text-[10px] text-zinc-400">student@campus.edu</span>
-              </button>
 
-              <button
-                type="button"
-                onClick={() => fillCredentials('admin@campus.edu', 'Admin123!')}
-                className="py-1.5 px-2.5 rounded-lg bg-zinc-950 border border-zinc-700 hover:border-zinc-600 text-zinc-200 text-xs text-left cursor-pointer font-medium"
-              >
-                <span className="font-bold text-white block">Admin Demo</span>
-                <span className="text-[10px] text-zinc-400">admin@campus.edu</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Footer Link */}

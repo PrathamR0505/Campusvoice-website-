@@ -56,19 +56,19 @@ export default function ImageUploader({ files, setFiles, maxFiles = 5 }) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 font-sans">
       <div className="flex items-center justify-between">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
           Media Evidence (Photos & Video)
         </label>
-        <span className="text-xs text-slate-500 font-medium">
+        <span className="text-xs text-zinc-400 font-medium">
           {files.length}/{maxFiles} attached
         </span>
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+        <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs flex items-center gap-2 font-medium">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 text-white" />
           <span>{error}</span>
         </div>
       )}
@@ -76,7 +76,7 @@ export default function ImageUploader({ files, setFiles, maxFiles = 5 }) {
       {/* Upload Dropzone */}
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-slate-50/60 hover:bg-blue-50/20 group"
+        className="border-2 border-dashed border-zinc-800 hover:border-zinc-500 rounded-2xl p-6 text-center cursor-pointer transition-colors bg-zinc-950 hover:bg-zinc-900/60 group"
       >
         <input
           ref={fileInputRef}
@@ -86,13 +86,13 @@ export default function ImageUploader({ files, setFiles, maxFiles = 5 }) {
           onChange={handleFileChange}
           className="hidden"
         />
-        <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform">
+        <div className="w-12 h-12 rounded-xl bg-zinc-800 text-white flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform border border-zinc-700">
           <Upload className="w-6 h-6" />
         </div>
-        <p className="text-sm font-semibold text-slate-800">
+        <p className="text-sm font-semibold text-white">
           Click to upload photos or optional video
         </p>
-        <p className="text-xs text-slate-500 mt-1">
+        <p className="text-xs text-zinc-400 mt-1">
           Supports JPEG, PNG, WEBP, and MP4 (up to 25MB each)
         </p>
       </div>
@@ -103,7 +103,7 @@ export default function ImageUploader({ files, setFiles, maxFiles = 5 }) {
           {files.map((item, idx) => (
             <div
               key={idx}
-              className="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-900 aspect-video flex items-center justify-center shadow-xs"
+              className="relative group rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 aspect-video flex items-center justify-center shadow-xs"
             >
               {item.type === 'video' ? (
                 <video
@@ -118,7 +118,7 @@ export default function ImageUploader({ files, setFiles, maxFiles = 5 }) {
                 />
               )}
 
-              <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-xs">
+              <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/70 text-white text-[10px] font-medium flex items-center gap-1 backdrop-blur-xs border border-zinc-700">
                 {item.type === 'video' ? <Video className="w-3 h-3" /> : <ImageIcon className="w-3 h-3" />}
                 <span>{item.size} MB</span>
               </div>
@@ -129,7 +129,7 @@ export default function ImageUploader({ files, setFiles, maxFiles = 5 }) {
                   e.stopPropagation();
                   removeFile(idx);
                 }}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity cursor-pointer shadow-sm"
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity cursor-pointer border border-zinc-600 shadow-sm"
                 aria-label="Remove media"
               >
                 <X className="w-3.5 h-3.5" />

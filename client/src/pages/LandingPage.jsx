@@ -22,6 +22,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   const [recentIssues, setRecentIssues] = useState([]);
+  const [loadingReports, setLoadingReports] = useState(true);
   const [stats, setStats] = useState({
     totalReports: 0,
     openReports: 0,
@@ -32,57 +33,33 @@ export default function LandingPage() {
   useEffect(() => {
     async function loadData() {
       try {
+        setLoadingReports(true);
         const [statsRes, reportsRes] = await Promise.all([
           api.get('/stats/summary').catch(() => null),
-          api.get('/reports?limit=3').catch(() => null)
+          api.get('/reports?sort_by=recent&limit=3').catch(() => null)
         ]);
 
         if (statsRes?.stats) {
           setStats(statsRes.stats);
         } else {
           setStats({
-            totalReports: 48,
-            openReports: 8,
-            resolvedReports: 40,
-            studentsAffected: 520,
+            totalReports: 0,
+            openReports: 0,
+            resolvedReports: 0,
+            studentsAffected: 0,
           });
         }
 
-        if (reportsRes?.reports && reportsRes.reports.length > 0) {
+        if (reportsRes?.reports && Array.isArray(reportsRes.reports)) {
           setRecentIssues(reportsRes.reports.slice(0, 3));
         } else {
-          setRecentIssues([
-            {
-              id: '1',
-              title: 'Main Academic Block 3rd Floor AC Not Cooling',
-              category: { name: 'Electricity', color: '#3F3F46' },
-              location: { name: 'Main Academic Block A' },
-              status: 'Action Initiated',
-              affected_count: 34,
-              created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
-            },
-            {
-              id: '2',
-              title: 'No Wi-Fi Connectivity in CS Lab 4',
-              category: { name: 'Wi-Fi / Internet', color: '#3F3F46' },
-              location: { name: 'Computer Science Block C' },
-              status: 'Under Review',
-              affected_count: 58,
-              created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
-            },
-            {
-              id: '3',
-              title: 'Water Dispenser Out of Water on Ground Floor',
-              category: { name: 'Water', color: '#3F3F46' },
-              location: { name: 'Student Canteen' },
-              status: 'Resolved',
-              affected_count: 82,
-              created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-            },
-          ]);
+          setRecentIssues([]);
         }
       } catch (e) {
         console.error('Error loading landing page data', e);
+        setRecentIssues([]);
+      } finally {
+        setLoadingReports(false);
       }
     }
     loadData();
@@ -103,14 +80,14 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto text-center relative z-10 my-auto">
           {/* Hero Main Heading */}
           <h1 className="font-serif text-5xl sm:text-7xl lg:text-8xl text-white tracking-tight leading-[1.1] mb-6 font-bold">
-            Your Campus.<br />
-            Your Voice.<br />
-            <span className="italic font-normal text-white underline decoration-zinc-600 decoration-1 underline-offset-8">Real Change.</span>
+            Our Campus.<br />
+            Our Voice.<br />
+            <span className="italic font-normal text-white underline decoration-zinc-600 decoration-1 underline-offset-8">Our Demand.</span>
           </h1>
 
           {/* Subheading */}
-          <p className="font-sans text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-            A transparent platform connecting students directly with campus administration. Report broken facilities, gather verified student support, and hold management accountable.
+          <p className="font-sans text-base sm:text-lg lg:text-xl text-zinc-300 max-w-3xl mx-auto mb-10 leading-relaxed font-normal">
+            Your fees deserve transparency. Your campus deserves accountability. Here students document inadequate facilities, submit real evidence, gather support from affected students, and track every response. Where are our fees being utilized instead of facilities?
           </p>
 
           {/* Action Buttons */}
@@ -133,23 +110,6 @@ export default function LandingPage() {
             </button>
 
           </div>
-
-          {/* Trust Badges */}
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs sm:text-sm text-zinc-400 font-sans">
-            <span className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-white" />
-              <span className="text-zinc-300">Verified Student Identity</span>
-            </span>
-            <span className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-zinc-300" />
-              <span className="text-zinc-300">Student Power in Numbers</span>
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-zinc-300" />
-              <span className="text-zinc-300">Resolution Sign-Off</span>
-            </span>
-          </div>
-
         </div>
       </section>
 
@@ -160,7 +120,7 @@ export default function LandingPage() {
         <div className="max-w-3xl w-full mx-auto">
           <div className="bg-[#121214] rounded-3xl border border-zinc-800 p-12 text-center shadow-2xl space-y-4">
             <span className="text-xs sm:text-sm font-sans font-bold text-zinc-400 uppercase tracking-widest block">
-              Total Reports Logged Across Campus
+              Total Reports Logged Across Campus till Date
             </span>
             <p className="font-serif text-6xl sm:text-8xl font-bold text-white tracking-tight">
               {stats.totalReports || 0}
@@ -194,45 +154,66 @@ export default function LandingPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {recentIssues.map((issue) => (
-              <div 
-                key={issue.id}
-                onClick={() => navigate(`/issue/${issue.id}`)}
-                className="bg-[#121214] rounded-2xl border border-zinc-800 p-6 hover:border-zinc-600 transition-all cursor-pointer flex flex-col justify-between group shadow-lg min-h-[220px]"
+          {loadingReports ? (
+            <div className="py-16 text-center text-zinc-500 font-sans text-xs">
+              Loading latest live reports...
+            </div>
+          ) : recentIssues.length === 0 ? (
+            <div className="bg-[#121214] rounded-2xl border border-zinc-800 p-12 text-center max-w-md mx-auto font-sans space-y-3 shadow-lg">
+              <AlertCircle className="w-8 h-8 text-zinc-500 mx-auto" />
+              <h3 className="font-serif text-xl font-bold text-white">No Active Reports Yet</h3>
+              <p className="font-sans text-xs text-zinc-400 leading-relaxed font-normal">
+                There are currently zero active issues reported on campus. Be the first student to document an observation.
+              </p>
+              <button
+                onClick={() => navigate('/report')}
+                className="mt-3 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-sans font-bold text-xs shadow-md transition-all cursor-pointer"
               >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span 
-                      className="text-[11px] font-sans font-bold px-2.5 py-1 rounded-md bg-zinc-900 text-zinc-200 border border-zinc-800"
-                    >
-                      {issue.category?.name || 'General'}
-                    </span>
-                    <span className="text-xs font-sans font-semibold px-2.5 py-0.5 rounded-full border bg-zinc-900 text-zinc-200 border-zinc-700">
-                      {issue.status}
-                    </span>
+                <PlusCircle className="w-4 h-4" />
+                Report an Issue
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recentIssues.map((issue) => (
+                <div 
+                  key={issue.id}
+                  onClick={() => navigate(`/issue/${issue.id}`)}
+                  className="bg-[#121214] rounded-2xl border border-zinc-800 p-6 hover:border-zinc-600 transition-all cursor-pointer flex flex-col justify-between group shadow-lg min-h-[220px]"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span 
+                        className="text-[11px] font-sans font-bold px-2.5 py-1 rounded-md bg-zinc-900 text-zinc-200 border border-zinc-800"
+                      >
+                        {issue.category?.name || 'General'}
+                      </span>
+                      <span className="text-xs font-sans font-semibold px-2.5 py-0.5 rounded-full border bg-zinc-900 text-zinc-200 border-zinc-700 capitalize">
+                        {issue.status}
+                      </span>
+                    </div>
+
+                    <h3 className="font-sans text-base font-bold text-white group-hover:text-zinc-300 transition-colors line-clamp-2 mb-2">
+                      {issue.title}
+                    </h3>
+
+                    <div className="flex items-center gap-1.5 text-xs font-sans text-zinc-400 mb-4">
+                      <Building2 className="w-3.5 h-3.5 text-zinc-500" />
+                      <span className="truncate">{issue.location?.name || issue.custom_location || 'Campus Location'}</span>
+                    </div>
                   </div>
 
-                  <h3 className="font-sans text-base font-bold text-white group-hover:text-zinc-300 transition-colors line-clamp-2 mb-2">
-                    {issue.title}
-                  </h3>
-
-                  <div className="flex items-center gap-1.5 text-xs font-sans text-zinc-400 mb-4">
-                    <Building2 className="w-3.5 h-3.5 text-zinc-500" />
-                    <span className="truncate">{issue.location?.name || 'Campus Location'}</span>
+                  <div className="pt-4 border-t border-zinc-800 flex items-center justify-between text-xs font-sans text-zinc-400">
+                    <span className="flex items-center gap-1 font-bold text-white">
+                      <ThumbsUp className="w-3.5 h-3.5" />
+                      {issue.affected_count || 1} Students Affected
+                    </span>
+                    <span className="text-zinc-400 group-hover:text-white transition-colors">Details →</span>
                   </div>
                 </div>
-
-                <div className="pt-4 border-t border-zinc-800 flex items-center justify-between text-xs font-sans text-zinc-400">
-                  <span className="flex items-center gap-1 font-bold text-white">
-                    <ThumbsUp className="w-3.5 h-3.5" />
-                    {issue.affected_count || 1} Students Affected
-                  </span>
-                  <span className="text-zinc-400 group-hover:text-white transition-colors">Details →</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

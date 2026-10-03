@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Megaphone, ShieldCheck } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -12,16 +11,12 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               <div className="flex flex-col">
                 <span className="font-serif text-xl font-bold text-white tracking-tight">CampusVoice</span>
-                <span className="font-sans text-xs text-zinc-400 font-medium">Student–Powered Transparency</span>
+                <span className="font-sans text-xs text-zinc-400 font-medium">Speak. Document. Demand.</span>
               </div>
             </div>
             <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md font-normal">
               A student-powered platform for documenting campus facility conditions, sharing verified evidence, and tracking whether reported issues are actually resolved.
             </p>
-            <div className="flex items-center gap-2 text-xs text-zinc-400 font-medium">
-              <ShieldCheck className="w-4 h-4 text-zinc-200" />
-              <span>Verified Student Accounts • Strict Privacy Safeguards</span>
-            </div>
           </div>
 
           {/* Quick Navigation */}
@@ -33,9 +28,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link to="/map" className="hover:text-white transition-colors">Interactive Campus Map</Link>
-              </li>
-              <li>
-                <Link to="/transparency" className="hover:text-white transition-colors">Transparency Analytics</Link>
               </li>
               <li>
                 <Link to="/report" className="hover:text-white transition-colors">Report New Issue</Link>

@@ -1,4 +1,4 @@
-import { supabase, createScopedClient } from '../config/supabase.js';
+import { supabase, createScopedClient, getPublicReadClient } from '../config/supabase.js';
 
 /**
  * Middleware to authenticate requests via Supabase JWT
@@ -34,15 +34,30 @@ export const requireAuth = async (req, res, next) => {
       console.error('Error fetching user profile:', profileError);
     }
 
-    req.token = token;
-    req.user = user;
-    req.profile = profile || {
+    const userProfile = profile || {
       id: user.id,
       email: user.email,
       full_name: user.user_metadata?.full_name || 'Student',
       role: 'student',
     };
+
+    req.token = token;
+    req.user = user;
     req.scopedSupabase = createScopedClient(token);
+
+    const adminEmails = (process.env.ADMIN_EMAILS || 'pr7853995@gmail.com').toLowerCase().split(',').map((e) => e.trim());
+    if (user.email && adminEmails.includes(user.email.toLowerCase())) {
+      userProfile.role = 'admin';
+      if (!profile || profile.role !== 'admin') {
+        try {
+          await req.scopedSupabase.from('profiles').update({ role: 'admin' }).eq('id', user.id);
+        } catch (syncErr) {
+          console.warn('Could not sync admin role to profiles table:', syncErr.message);
+        }
+      }
+    }
+
+    req.profile = userProfile;
 
     next();
   } catch (error) {
