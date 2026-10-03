@@ -1,52 +1,52 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Megaphone, ShieldCheck, Heart, ExternalLink } from 'lucide-react';
+import { Megaphone, ShieldCheck } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 border-t border-slate-800 text-slate-400 text-sm">
+    <footer className="bg-[#09090b] border-t border-zinc-800 text-zinc-400 text-sm font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-                <Megaphone className="w-4 h-4" />
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col">
+                <span className="font-serif text-xl font-bold text-white tracking-tight">CampusVoice</span>
+                <span className="font-sans text-xs text-zinc-400 font-medium">Student–Powered Transparency</span>
               </div>
-              <span className="font-bold text-white text-base">CampusVoice</span>
             </div>
-            <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-md">
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md font-normal">
               A student-powered platform for documenting campus facility conditions, sharing verified evidence, and tracking whether reported issues are actually resolved.
             </p>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Verified College Student Accounts • Strict Privacy Safeguards</span>
+            <div className="flex items-center gap-2 text-xs text-zinc-400 font-medium">
+              <ShieldCheck className="w-4 h-4 text-zinc-200" />
+              <span>Verified Student Accounts • Strict Privacy Safeguards</span>
             </div>
           </div>
 
           {/* Quick Navigation */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-200 mb-3">Platform</h4>
-            <ul className="space-y-2 text-xs sm:text-sm">
+            <h4 className="font-sans text-xs font-semibold uppercase tracking-wider text-zinc-200 mb-3">Platform</h4>
+            <ul className="space-y-2 text-xs sm:text-sm font-medium">
               <li>
-                <Link to="/feed" className="hover:text-blue-400 transition-colors">Campus Feed</Link>
+                <Link to="/feed" className="hover:text-white transition-colors">Campus Feed</Link>
               </li>
               <li>
-                <Link to="/map" className="hover:text-blue-400 transition-colors">Interactive Campus Map</Link>
+                <Link to="/map" className="hover:text-white transition-colors">Interactive Campus Map</Link>
               </li>
               <li>
-                <Link to="/transparency" className="hover:text-blue-400 transition-colors">Transparency Analytics</Link>
+                <Link to="/transparency" className="hover:text-white transition-colors">Transparency Analytics</Link>
               </li>
               <li>
-                <Link to="/report" className="hover:text-blue-400 transition-colors">Report New Issue</Link>
+                <Link to="/report" className="hover:text-white transition-colors">Report New Issue</Link>
               </li>
             </ul>
           </div>
 
           {/* Accountability Standards */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-200 mb-3">Accountability</h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-slate-400">
+            <h4 className="font-sans text-xs font-semibold uppercase tracking-wider text-zinc-200 mb-3">Accountability</h4>
+            <ul className="space-y-2 text-xs sm:text-sm text-zinc-400 font-normal">
               <li>Evidence-Based Documentation</li>
               <li>Community Impact Verification</li>
               <li>Official Administration Audit Trail</li>
@@ -55,10 +55,17 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
-          <p>© {new Date().getFullYear()} CampusVoice Platform. Built for student body facility transparency.</p>
-          <p className="flex items-center gap-1">
-            Student-first campus governance
+        <div className="mt-8 pt-6 border-t border-zinc-800/80 flex flex-col md:flex-row items-center justify-between text-xs text-zinc-400 gap-4 font-medium">
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 text-center sm:text-left">
+            <span className="text-zinc-300 font-normal whitespace-nowrap">
+              Created by Pratham
+            </span>
+            <span className="text-white font-bold text-sm sm:text-base leading-relaxed max-w-xl">
+              • Website Created to raise voice against illegal fees hike For VTU Students To show what facilities the college is providing
+            </span>
+          </div>
+          <p className="text-white font-bold text-center md:text-right tracking-tight max-w-md">
+            Our campus. Our voice. Our Demand against illegal fees hike
           </p>
         </div>
       </div>

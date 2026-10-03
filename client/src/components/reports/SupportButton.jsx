@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '../../services/api';
-import { Users, CheckCircle2, MessageSquare, Plus, AlertCircle } from 'lucide-react';
+import { Users, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function SupportButton({
   reportId,
@@ -47,8 +47,8 @@ export default function SupportButton({
   return (
     <div>
       {error && (
-        <div className="mb-2 p-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-1.5">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+        <div className="mb-2 p-2 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs flex items-center gap-1.5 font-medium">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 text-white" />
           <span>{error}</span>
         </div>
       )}
@@ -66,16 +66,16 @@ export default function SupportButton({
               handleToggle();
             }
           }}
-          className={`inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-xs cursor-pointer ${
+          className={`inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-md cursor-pointer ${
             isReporter
-              ? 'bg-blue-50 text-blue-700 border border-blue-200 cursor-default'
+              ? 'bg-zinc-800 text-zinc-300 border border-zinc-700 cursor-default'
               : hasSupported
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
-              : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/20'
-          } disabled:opacity-70`}
+              ? 'bg-zinc-100 hover:bg-white text-zinc-950 shadow-white/10'
+              : 'bg-white hover:bg-zinc-200 text-zinc-950 shadow-white/10'
+          } disabled:opacity-70 font-sans`}
         >
           {hasSupported || isReporter ? (
-            <CheckCircle2 className="w-4 h-4 text-white" />
+            <CheckCircle2 className="w-4 h-4 text-zinc-950" />
           ) : (
             <Users className="w-4 h-4" />
           )}
@@ -87,14 +87,14 @@ export default function SupportButton({
               : "I'M AFFECTED BY THIS"}
           </span>
           <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-            hasSupported || isReporter ? 'bg-white/20 text-white' : 'bg-blue-700 text-white'
+            hasSupported || isReporter ? 'bg-zinc-950 text-white' : 'bg-zinc-900 text-white'
           }`}>
             {affectedCount}
           </span>
         </button>
 
         {hasSupported && !isReporter && (
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-zinc-400 font-sans">
             Click again to remove your impact confirmation.
           </span>
         )}
@@ -102,18 +102,18 @@ export default function SupportButton({
 
       {/* Statement Modal when adding impact */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center gap-2.5 text-blue-600 mb-2">
-              <Users className="w-5 h-5" />
-              <h3 className="font-bold text-lg text-slate-900">Confirm You Are Affected</h3>
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
+          <div className="bg-[#121214] rounded-2xl border border-zinc-800 shadow-2xl max-w-lg w-full p-6 animate-in fade-in zoom-in-95 duration-150 text-zinc-100">
+            <div className="flex items-center gap-2.5 text-white mb-2">
+              <Users className="w-5 h-5 text-white" />
+              <h3 className="font-serif text-xl font-bold text-white">Confirm You Are Affected</h3>
             </div>
-            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+            <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-normal">
               Your verified student confirmation will increase the official severity metrics for administration review.
             </p>
 
             <div className="mb-4">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
                 Add an Optional Student Statement (Facility Condition Note)
               </label>
               <textarea
@@ -121,9 +121,9 @@ export default function SupportButton({
                 placeholder="e.g. 'Our laboratory has 30 computers, but only 18 were functioning during today\'s practical session.'"
                 value={statement}
                 onChange={(e) => setStatement(e.target.value)}
-                className="w-full p-3 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-slate-400"
+                className="w-full p-3 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all placeholder:text-zinc-600 font-normal"
               />
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-zinc-500 mt-1">
                 Please focus on documented equipment and facility conditions.
               </p>
             </div>
@@ -134,9 +134,9 @@ export default function SupportButton({
                 id="statement_anon"
                 checked={isAnonymousStatement}
                 onChange={(e) => setIsAnonymousStatement(e.target.checked)}
-                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 cursor-pointer"
+                className="w-4 h-4 rounded text-zinc-100 focus:ring-zinc-400 border-zinc-700 bg-zinc-950 cursor-pointer"
               />
-              <label htmlFor="statement_anon" className="text-xs text-slate-700 font-medium cursor-pointer">
+              <label htmlFor="statement_anon" className="text-xs text-zinc-300 font-medium cursor-pointer">
                 Submit statement anonymously (hide my name and student ID)
               </label>
             </div>
@@ -145,7 +145,7 @@ export default function SupportButton({
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -153,7 +153,7 @@ export default function SupportButton({
                 type="button"
                 disabled={loading}
                 onClick={() => handleToggle(statement)}
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer disabled:opacity-60"
+                className="px-5 py-2 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold shadow-sm transition-all cursor-pointer disabled:opacity-60"
               >
                 {loading ? 'Confirming...' : "Confirm Impact"}
               </button>

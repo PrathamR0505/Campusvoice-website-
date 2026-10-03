@@ -33,7 +33,6 @@ export default function CategoryBadge({ category, size = 'sm' }) {
   if (!category) return null;
 
   const IconComponent = (category.icon && iconMap[category.icon]) || HelpCircle;
-  const color = category.color || '#2563EB';
 
   const sizeClasses = {
     xs: 'px-2 py-0.5 text-[10px] gap-1',
@@ -43,11 +42,11 @@ export default function CategoryBadge({ category, size = 'sm' }) {
 
   return (
     <span
-      className={`inline-flex items-center font-medium rounded-lg bg-slate-100 text-slate-800 border border-slate-200/80 ${
+      className={`inline-flex items-center font-medium rounded-lg bg-zinc-900 text-zinc-200 border border-zinc-800 ${
         sizeClasses[size] || sizeClasses.sm
       }`}
     >
-      <span style={{ color }}>
+      <span className="text-zinc-400">
         <IconComponent className="w-3.5 h-3.5" />
       </span>
       <span>{category.name}</span>

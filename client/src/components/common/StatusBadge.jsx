@@ -4,32 +4,32 @@ import { AlertCircle, Clock, Wrench, CheckCircle2, RotateCcw } from 'lucide-reac
 export default function StatusBadge({ status, size = 'sm' }) {
   const configs = {
     'Reported': {
-      bg: 'bg-red-50 text-red-700 border-red-200',
-      dot: 'bg-red-500',
+      bg: 'bg-zinc-900/90 text-zinc-200 border-zinc-700/80',
+      dot: 'bg-white',
       icon: AlertCircle,
       label: 'Reported',
     },
     'Under Review': {
-      bg: 'bg-amber-50 text-amber-700 border-amber-200',
-      dot: 'bg-amber-500',
+      bg: 'bg-zinc-900/90 text-zinc-200 border-zinc-700/80',
+      dot: 'bg-zinc-400',
       icon: Clock,
       label: 'Under Review',
     },
     'Action Initiated': {
-      bg: 'bg-blue-50 text-blue-700 border-blue-200',
-      dot: 'bg-blue-500',
+      bg: 'bg-zinc-900/90 text-zinc-200 border-zinc-700/80',
+      dot: 'bg-zinc-300',
       icon: Wrench,
       label: 'Action Initiated',
     },
     'Resolved': {
-      bg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      dot: 'bg-emerald-500',
+      bg: 'bg-zinc-900/90 text-zinc-100 border-zinc-600',
+      dot: 'bg-white',
       icon: CheckCircle2,
       label: 'Resolved',
     },
     'Reopened': {
-      bg: 'bg-orange-50 text-orange-700 border-orange-200',
-      dot: 'bg-orange-500',
+      bg: 'bg-zinc-900/90 text-zinc-200 border-zinc-700/80',
+      dot: 'bg-zinc-400',
       icon: RotateCcw,
       label: 'Reopened',
     },
@@ -46,7 +46,7 @@ export default function StatusBadge({ status, size = 'sm' }) {
 
   return (
     <span
-      className={`inline-flex items-center font-semibold rounded-full border shadow-2xs ${config.bg} ${
+      className={`inline-flex items-center font-semibold rounded-full border shadow-2xs backdrop-blur-xs ${config.bg} ${
         sizeClasses[size] || sizeClasses.sm
       }`}
     >

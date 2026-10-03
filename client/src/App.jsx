@@ -24,9 +24,9 @@ export default function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+        <div className="min-h-screen flex flex-col bg-[#09090b] text-zinc-100 font-sans selection:bg-white selection:text-black">
           <Navbar />
-          <main className="flex-1">
+          <main className="flex-1 flex flex-col min-h-[calc(100vh-4rem)]">
             <Routes>
               {/* Public & Authenticated Discovery Routes */}
               <Route path="/" element={<LandingPage />} />

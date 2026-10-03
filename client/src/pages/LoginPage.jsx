@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Megaphone, Mail, Lock, AlertCircle, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Megaphone, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -46,26 +46,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-[#09090b] font-sans">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex p-3 rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/20 mb-4">
+          <div className="inline-flex p-3 rounded-2xl bg-zinc-100 text-zinc-950 font-bold shadow-lg mb-4">
             <Megaphone className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="font-serif text-3xl font-bold text-white tracking-tight">
             Welcome to CampusVoice
           </h1>
-          <p className="text-sm text-slate-600 mt-2">
+          <p className="font-sans text-sm text-zinc-400 mt-2 font-normal">
             Sign in to document, track, and support campus facility issues.
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+        <div className="bg-[#121214] rounded-2xl border border-zinc-800 shadow-xl p-6 sm:p-8 font-sans">
           {error && (
-            <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-2.5">
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            <div className="mb-5 p-3.5 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 text-sm flex items-start gap-2.5 font-medium">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-white" />
               <span>{error}</span>
             </div>
           )}
@@ -74,7 +74,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="w-full py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm shadow-sm transition-all flex items-center justify-center gap-3 cursor-pointer mb-4"
+            className="w-full py-2.5 px-4 rounded-xl border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-100 font-semibold text-sm shadow-sm transition-all flex items-center justify-center gap-3 cursor-pointer mb-4 font-sans"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -87,52 +87,52 @@ export default function LoginPage() {
 
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
+              <div className="w-full border-t border-zinc-800"></div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-400 font-medium">Or sign in with email</span>
+            <div className="relative flex justify-center text-xs uppercase font-sans font-medium">
+              <span className="bg-[#121214] px-2 text-zinc-400">Or sign in with email</span>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 font-sans">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
                 College Email
               </label>
               <div className="relative">
-                <Mail className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-5 h-5 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
                   placeholder="student@campus.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-slate-400"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all placeholder:text-zinc-600 font-medium"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300">
                   Password
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-xs font-medium text-blue-600 hover:text-blue-500"
+                  className="text-xs text-zinc-400 hover:text-white font-semibold underline decoration-zinc-600"
                 >
                   Forgot password?
                 </Link>
               </div>
               <div className="relative">
-                <Lock className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-5 h-5 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="password"
                   required
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-slate-400"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400 transition-all placeholder:text-zinc-600 font-medium"
                 />
               </div>
             </div>
@@ -140,55 +140,47 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full mt-2 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2 font-sans"
             >
-              {submitting ? 'Authenticating...' : (
-                <>
-                  <span>Sign In</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
+              <span>{submitting ? 'Signing in...' : 'Sign In'}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
-          {/* Quick Demo Credentials for Testing */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 text-center">
-              Quick Test Credentials
+          {/* Quick Demo Login Preset Buttons */}
+          <div className="mt-6 pt-4 border-t border-zinc-800 space-y-2 font-sans">
+            <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              Quick One-Click Demo Sign In:
             </p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => fillCredentials('arjun@campus.edu', 'Password123!')}
-                className="py-2 px-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-colors text-left flex items-center gap-1.5 cursor-pointer"
+                onClick={() => fillCredentials('student@campus.edu', 'Student123!')}
+                className="py-1.5 px-2.5 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-zinc-700 text-zinc-300 text-xs text-left cursor-pointer font-medium"
               >
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
-                <span>Fill Student</span>
+                <span className="font-bold text-white block">Student Demo</span>
+                <span className="text-[10px] text-zinc-400">student@campus.edu</span>
               </button>
+
               <button
                 type="button"
-                onClick={() => fillCredentials('admin@campus.edu', 'AdminPassword123!')}
-                className="py-2 px-2.5 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-medium transition-colors text-left flex items-center gap-1.5 cursor-pointer"
+                onClick={() => fillCredentials('admin@campus.edu', 'Admin123!')}
+                className="py-1.5 px-2.5 rounded-lg bg-zinc-950 border border-zinc-700 hover:border-zinc-600 text-zinc-200 text-xs text-left cursor-pointer font-medium"
               >
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                <span>Fill Admin</span>
+                <span className="font-bold text-white block">Admin Demo</span>
+                <span className="text-[10px] text-zinc-400">admin@campus.edu</span>
               </button>
             </div>
           </div>
-
-          <div className="mt-6 text-center text-xs text-slate-600">
-            Don't have an account yet?{' '}
-            <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-500">
-              Register with College ID
-            </Link>
-          </div>
         </div>
 
-        {/* Security badge */}
-        <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500">
-          <ShieldCheck className="w-4 h-4 text-emerald-500" />
-          <span>Restricted to verified campus domains • Anti-spam protection</span>
-        </div>
+        {/* Footer Link */}
+        <p className="text-center text-xs text-zinc-400 mt-6 font-sans">
+          Don't have a verified account yet?{' '}
+          <Link to="/register" className="font-semibold text-white hover:underline">
+            Register Account
+          </Link>
+        </p>
       </div>
     </div>
   );
