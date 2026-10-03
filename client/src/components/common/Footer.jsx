@@ -55,18 +55,20 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-zinc-800/80 flex flex-col md:flex-row items-center justify-between text-xs text-zinc-400 gap-4 font-medium">
-          <div className="flex flex-col sm:flex-row items-center gap-2.5 text-center sm:text-left">
-            <span className="text-zinc-300 font-normal whitespace-nowrap">
-              Created by Pratham
-            </span>
-            <span className="text-white font-bold text-sm sm:text-base leading-relaxed max-w-xl">
+        <div className="mt-8 pt-6 border-t border-zinc-800/80 space-y-4 text-xs font-medium">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <span className="text-white font-bold text-sm sm:text-base leading-relaxed max-w-xl text-center md:text-left">
               • Website Created to raise voice against illegal fees hike For VTU Students To show what facilities the college is providing
             </span>
+            <p className="text-white font-bold text-center md:text-right tracking-tight max-w-md">
+              Our campus. Our voice. Our Demand against illegal fees hike
+            </p>
           </div>
-          <p className="text-white font-bold text-center md:text-right tracking-tight max-w-md">
-            Our campus. Our voice. Our Demand against illegal fees hike
-          </p>
+          <div className="pt-3 border-t border-zinc-900 text-center">
+            <span className="text-zinc-400 font-normal text-xs">
+              Created by MrPR
+            </span>
+          </div>
         </div>
       </div>
     </footer>
