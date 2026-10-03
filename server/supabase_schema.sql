@@ -294,12 +294,18 @@ ON public.notifications FOR UPDATE TO authenticated USING (auth.uid() = user_id)
 
 -- TRIGGER: Auto-confirm user email immediately (prevents email confirmation blockages)
 CREATE OR REPLACE FUNCTION public.auto_confirm_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER 
+LANGUAGE plpgsql 
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
   NEW.email_confirmed_at := NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.auto_confirm_user() FROM PUBLIC, anon, authenticated;
 
 DROP TRIGGER IF EXISTS on_auth_user_created_auto_confirm ON auth.users;
 
@@ -309,7 +315,11 @@ CREATE TRIGGER on_auth_user_created_auto_confirm
 
 -- TRIGGER: Auto-create/update profile on auth.users insert (Supports Email & Google OAuth)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
+RETURNS trigger 
+LANGUAGE plpgsql 
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
     INSERT INTO public.profiles (id, full_name, email, student_id, college_domain, role, avatar_url)
     VALUES (
@@ -326,7 +336,9 @@ BEGIN
         avatar_url = COALESCE(public.profiles.avatar_url, EXCLUDED.avatar_url);
     RETURN new;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
@@ -335,7 +347,11 @@ CREATE TRIGGER on_auth_user_created
 
 -- TRIGGER: Update affected_count on report_support insert/delete
 CREATE OR REPLACE FUNCTION public.update_report_affected_count()
-RETURNS trigger AS $$
+RETURNS trigger 
+LANGUAGE plpgsql 
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
     IF (TG_OP = 'INSERT') THEN
         UPDATE public.reports
@@ -364,7 +380,9 @@ BEGIN
     END IF;
     RETURN NULL;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.update_report_affected_count() FROM PUBLIC, anon, authenticated;
 
 DROP TRIGGER IF EXISTS on_report_support_change ON public.report_support;
 CREATE TRIGGER on_report_support_change
